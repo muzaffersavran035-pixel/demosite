@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bionluk Demo - Freelance Pazar Yeri</title>
+    <title>Bionluk Demo</title>
     <style>
         :root {
-            --primary: #4f46e5;
+            --primary: #6366f1;
+            --success: #22c55e;
+            --danger: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e2937; }
@@ -25,21 +27,21 @@
         }
         .nav-link:hover { background: #f1f5f9; color: var(--primary); }
         .container { padding: 1rem; }
-        h1, h2 { margin-bottom: 1rem; }
         .card {
-            background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;
+            background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         button {
-            padding: 0.6rem 1.2rem; background: var(--primary); color: white; border: none;
-            border-radius: 8px; cursor: pointer;
+            padding: 0.7rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;
         }
-        .delete-btn { background: #ef4444; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-delete { background: var(--danger); color: white; }
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #1e2937; color: white; padding: 1rem; border-radius: 8px;
-            display: none; z-index: 300;
+            background: #1e2937; color: white; padding: 1rem 1.5rem; border-radius: 8px;
+            display: none; z-index: 300; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -60,26 +62,27 @@
     </div>
 
     <div class="container" id="content">
-        <h1>Hoş Geldin, Demo Kullanıcısı!</h1>
-        <p>Bu, Bionluk tarzı tam işlevsel bir demo sitedir. Menüden sayfalar arasında gezinebilirsin.</p>
-        
-        <div class="card">
-            <h2>Örnek Siparişler</h2>
-            <p>Siparişler sayfasını görmek için menüden "Siparişlerim"e dokun.</p>
-        </div>
+        <!-- İçerik JavaScript ile doldurulacak -->
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        let orders = [
-            {id: 1, title: "Logo Tasarımı", freelancer: "Ahmet Yılmaz", status: "Tamamlandı", price: "1250 TL"},
-            {id: 2, title: "Web Sitesi Yapımı", freelancer: "Ayşe Demir", status: "İptal Edildi", price: "4500 TL"},
-            {id: 3, title: "Instagram İçerik Yönetimi", freelancer: "Mehmet Kaya", status: "Bekliyor", price: "800 TL"},
-        ];
-
         function toggleMenu() {
             document.getElementById('menu').classList.toggle('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function deleteItem(id) {
+            if (confirm("Silmek istediğinize emin misiniz?")) {
+                showToast("✅ Öğe silindi (Demo - Yenilendiğinde geri gelir)");
+            }
         }
 
         function navigate(page) {
@@ -87,40 +90,25 @@
             const content = document.getElementById('content');
             
             if (page === 'orders') {
-                let html = `<h1>Siparişlerim</h1>`;
-                orders.forEach(order => {
-                    html += `
-                        <div class="card">
-                            <h3>${order.title}</h3>
-                            <p>Freelancer: ${order.freelancer}</p>
-                            <p>Durum: <strong>${order.status}</strong></p>
-                            <p>Fiyat: ${order.price}</p>
-                            <button onclick="editOrder(${order.id})">Düzenle</button>
-                            <button class="delete-btn" onclick="deleteOrder(${order.id})">Sil</button>
-                        </div>`;
-                });
-                content.innerHTML = html;
+                content.innerHTML = `
+                    <h1>Siparişlerim</h1>
+                    <div class="card">
+                        <h3>Logo Tasarımı</h3>
+                        <p>Freelancer: Ahmet Yılmaz</p>
+                        <p>Durum: <span class="status" style="background:#22c55e;color:white;">Tamamlandı</span></p>
+                        <p>Fiyat: 1250 TL</p>
+                        <button class="btn-edit" onclick="alert('Demo modunda düzenleme var')">Düzenle</button>
+                        <button class="btn-delete" onclick="deleteItem(1)">Sil</button>
+                    </div>
+                    <!-- Diğer siparişler buraya eklenebilir -->
+                `;
+            } else if (page === 'dashboard') {
+                content.innerHTML = `<h1>Dashboard</h1><p>Bu ay 12 yeni sipariş, 8 tamamlanmış proje.</p>`;
             } else {
-                content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><p>Bu sayfa demo amaçlı hazırlanmıştır.</p>`;
+                content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><p>Bu sayfa demo amaçlı hazırlanmıştır. Daha fazla içerik eklenebilir.</p>`;
             }
         }
 
-        function deleteOrder(id) {
-            if (confirm("Bu siparişi silmek istediğinize emin misiniz?")) {
-                const toast = document.getElementById('toast');
-                toast.textContent = "Sipariş silindi (Demo - Yenilendiğinde geri gelir)";
-                toast.style.display = 'block';
-                setTimeout(() => toast.style.display = 'none', 3000);
-                
-                // Gerçek silme yapmıyoruz, sadece gösteriyoruz
-            }
-        }
-
-        function editOrder(id) {
-            alert("Demo modunda düzenleme özelliği aktif değildir.");
-        }
-
-        // İlk yüklemede dashboard göster
         window.onload = () => navigate('dashboard');
     </script>
 </body>
