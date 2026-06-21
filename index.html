@@ -17,74 +17,36 @@
             color: var(--dark-brown); 
             overflow-x: hidden;
         }
-        .header {
-            background: white; 
-            padding: 1rem; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
+        .header { background: white; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;
         }
         .hamburger { font-size: 1.8rem; cursor: pointer; color: var(--dark-brown); }
-        .menu {
-            position: fixed; top: 0; left: -100%; width: 80%; height: 100%; 
-            background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
-            transition: 0.3s; padding: 2rem 1rem; z-index: 200;
+        .menu { position: fixed; top: 0; left: -100%; width: 80%; height: 100%; background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: 0.3s; padding: 2rem 1rem; z-index: 200;
         }
         .menu.active { left: 0; }
-        .nav-link {
-            display: block; padding: 1rem; font-size: 1.1rem; 
-            color: var(--dark-brown); text-decoration: none; 
-            border-bottom: 1px solid #e2e8f0;
+        .nav-link { display: block; padding: 1rem; font-size: 1.1rem; color: var(--dark-brown);
+            text-decoration: none; border-bottom: 1px solid #e2e8f0;
         }
         .nav-link:hover { background: var(--light-brown); color: var(--turquoise); }
         .container { padding: 1rem; }
         .card {
-            background: white; 
-            border-radius: 12px; 
-            padding: 1.2rem; 
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--turquoise);
+            background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--turquoise);
         }
         button {
-            padding: 0.7rem 1.2rem; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 500;
-            margin-right: 8px;
+            padding: 0.7rem 1.2rem; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 500; margin-right: 8px;
         }
         .btn-edit { background: var(--turquoise); color: white; }
         .btn-delete { background: #ef4444; color: white; }
 
-        /* Dokunma / Tıklama Efekti */
+        /* Ripple Efekti */
         .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(64, 224, 208, 0.4);
-            transform: scale(0);
-            animation: rippleAnim 600ms linear;
-            pointer-events: none;
-            z-index: 9999;
+            position: absolute; border-radius: 50%; background: rgba(64, 224, 208, 0.5);
+            transform: scale(0); animation: rippleAnim 700ms linear; pointer-events: none; z-index: 9999;
         }
-        @keyframes rippleAnim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--dark-brown); color: white; 
-            padding: 1rem 1.5rem; border-radius: 8px;
-            display: none; z-index: 300;
-        }
-        h1 { color: var(--dark-brown); margin-bottom: 1rem; }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -105,44 +67,43 @@
     </div>
 
     <div class="container" id="content"></div>
-    <div class="toast" id="toast"></div>
+
+    <!-- Ses Efekti -->
+    <audio id="clickSound" preload="auto">
+        <source src="https://freesound.org/data/previews/66/66930_931655-lq.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
+        const clickSound = document.getElementById('clickSound');
+
+        function playClickSound() {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(() => {}); // Hata vermemesi için
+        }
+
         function createRipple(event) {
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
-            
-            const rect = document.body.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height) * 0.6;
-            
+            const size = 80;
             ripple.style.width = ripple.style.height = size + 'px';
             ripple.style.left = (event.clientX || event.touches[0].clientX) - size/2 + 'px';
             ripple.style.top = (event.clientY || event.touches[0].clientY) - size/2 + 'px';
-            
             document.body.appendChild(ripple);
-            
             setTimeout(() => ripple.remove(), 700);
         }
 
-        // Tüm tıklama ve dokunmalarda ripple efekti
-        document.addEventListener('click', createRipple);
-        document.addEventListener('touchstart', createRipple);
+        // Tüm etkileşimlerde ses + ripple
+        document.addEventListener('click', (e) => {
+            createRipple(e);
+            playClickSound();
+        });
+        document.addEventListener('touchstart', (e) => {
+            createRipple(e);
+            playClickSound();
+        });
 
         function toggleMenu() {
             document.getElementById('menu').classList.toggle('active');
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
-        }
-
-        function deleteItem() {
-            if (confirm("Bu öğeyi silmek istediğinize emin misiniz?")) {
-                showToast("✅ Silindi (Demo - Sayfa yenilenince geri gelir)");
-            }
         }
 
         function navigate(page) {
@@ -156,10 +117,15 @@
                     <h1>Siparişlerim</h1>
                     <div class="card"><h3>Logo Tasarımı</h3><p>Ahmet Yılmaz • Tamamlandı • 1250 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
                     <div class="card"><h3>Web Sitesi Yapımı</h3><p>Ayşe Demir • İptal Edildi • 4500 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                    <div class="card"><h3>Instagram İçerik</h3><p>Mehmet Kaya • Bekliyor • 800 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
                 `;
             } else {
                 content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><div class="card"><p>Bu sayfa demo amaçlı hazırlanmıştır.</p></div>`;
+            }
+        }
+
+        function deleteItem() {
+            if (confirm("Silmek istediğinize emin misiniz?")) {
+                alert("✅ Silindi (Demo modunda kalıcı değildir)");
             }
         }
 
