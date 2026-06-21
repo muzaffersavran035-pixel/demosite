@@ -15,6 +15,7 @@
             font-family: 'Segoe UI', sans-serif; 
             background: var(--light-brown); 
             color: var(--dark-brown); 
+            overflow-x: hidden;
         }
         .header {
             background: white; 
@@ -59,6 +60,24 @@
         }
         .btn-edit { background: var(--turquoise); color: white; }
         .btn-delete { background: #ef4444; color: white; }
+
+        /* Dokunma / Tıklama Efekti */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(64, 224, 208, 0.4);
+            transform: scale(0);
+            animation: rippleAnim 600ms linear;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: var(--dark-brown); color: white; 
@@ -89,6 +108,26 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        function createRipple(event) {
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            
+            const rect = document.body.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 0.6;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (event.clientX || event.touches[0].clientX) - size/2 + 'px';
+            ripple.style.top = (event.clientY || event.touches[0].clientY) - size/2 + 'px';
+            
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 700);
+        }
+
+        // Tüm tıklama ve dokunmalarda ripple efekti
+        document.addEventListener('click', createRipple);
+        document.addEventListener('touchstart', createRipple);
+
         function toggleMenu() {
             document.getElementById('menu').classList.toggle('active');
         }
@@ -111,72 +150,16 @@
             const content = document.getElementById('content');
             
             if (page === 'dashboard') {
-                content.innerHTML = `
-                    <h1>Dashboard</h1>
-                    <div class="card"><h3>Bu Ay</h3><p>• 28 Yeni Sipariş<br>• 19 Tamamlanan İş<br>• Toplam Kazanç: 47.850 TL</p></div>
-                `;
-            } 
-            else if (page === 'orders') {
+                content.innerHTML = `<h1>Dashboard</h1><div class="card"><h3>Bu Ay Özeti</h3><p>• 28 Yeni Sipariş<br>• 19 Tamamlanan İş<br>• Toplam Kazanç: 47.850 TL</p></div>`;
+            } else if (page === 'orders') {
                 content.innerHTML = `
                     <h1>Siparişlerim</h1>
-                    <div class="card">
-                        <h3>Logo Tasarımı</h3><p>Freelancer: Ahmet Yılmaz</p>
-                        <p>Durum: Tamamlandı • 1250 TL</p>
-                        <button class="btn-edit">Düzenle</button>
-                        <button class="btn-delete" onclick="deleteItem()">Sil</button>
-                    </div>
-                    <div class="card">
-                        <h3>Web Sitesi Yapımı</h3><p>Freelancer: Ayşe Demir</p>
-                        <p>Durum: İptal Edildi • 4500 TL</p>
-                        <button class="btn-edit">Düzenle</button>
-                        <button class="btn-delete" onclick="deleteItem()">Sil</button>
-                    </div>
-                    <div class="card">
-                        <h3>Instagram İçerik Yönetimi</h3><p>Freelancer: Mehmet Kaya</p>
-                        <p>Durum: Bekliyor • 800 TL</p>
-                        <button class="btn-edit">Düzenle</button>
-                        <button class="btn-delete" onclick="deleteItem()">Sil</button>
-                    </div>
+                    <div class="card"><h3>Logo Tasarımı</h3><p>Ahmet Yılmaz • Tamamlandı • 1250 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
+                    <div class="card"><h3>Web Sitesi Yapımı</h3><p>Ayşe Demir • İptal Edildi • 4500 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
+                    <div class="card"><h3>Instagram İçerik</h3><p>Mehmet Kaya • Bekliyor • 800 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
                 `;
-            } 
-            else if (page === 'freelancers') {
-                content.innerHTML = `
-                    <h1>Freelancerlar</h1>
-                    <div class="card"><h3>Ahmet Yılmaz</h3><p>Uzmanlık: Grafik Tasarım • 4.9 ★ (124 iş)</p></div>
-                    <div class="card"><h3>Ayşe Demir</h3><p>Uzmanlık: Web Geliştirme • 5.0 ★ (89 iş)</p></div>
-                    <div class="card"><h3>Fatma Şahin</h3><p>Uzmanlık: Sosyal Medya • 4.8 ★ (67 iş)</p></div>
-                `;
-            } 
-            else if (page === 'services') {
-                content.innerHTML = `
-                    <h1>Hizmetler</h1>
-                    <div class="card"><h3>Logo & Kurumsal Kimlik</h3><p>Fiyat: 800 - 3500 TL</p></div>
-                    <div class="card"><h3>Web Sitesi Tasarımı</h3><p>Fiyat: 4500 - 15000 TL</p></div>
-                    <div class="card"><h3>Sosyal Medya Yönetimi</h3><p>Fiyat: 1200 - 4000 TL</p></div>
-                `;
-            } 
-            else if (page === 'customers') {
-                content.innerHTML = `
-                    <h1>Müşteriler</h1>
-                    <div class="card"><h3>Mehmet Öztürk</h3><p>3 Sipariş • Son işlem: 2 gün önce</p></div>
-                    <div class="card"><h3>Zeynep Kaya</h3><p>7 Sipariş • Sadık Müşteri</p></div>
-                    <div class="card"><h3>Burak Yılmaz</h3><p>1 Sipariş • Yeni</p></div>
-                    <div class="card"><h3>Elif Demir</h3><p>4 Sipariş</p></div>
-                `;
-            } 
-            else if (page === 'reports') {
-                content.innerHTML = `
-                    <h1>Raporlar</h1>
-                    <div class="card"><h3>Bu Ay Özeti</h3><p>Toplam Gelir: 47.850 TL<br>En Çok Talep: Web Sitesi</p></div>
-                    <div class="card"><h3>En Başarılı Freelancer</h3><p>Ayşe Demir - 5 iş</p></div>
-                `;
-            } 
-            else if (page === 'settings') {
-                content.innerHTML = `
-                    <h1>Ayarlar</h1>
-                    <div class="card"><h3>Profil Bilgileri</h3><p>Ad Soyad, E-posta, Telefon</p></div>
-                    <div class="card"><h3>Bildirim Ayarları</h3><p>E-posta ve Push Bildirimleri</p></div>
-                `;
+            } else {
+                content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><div class="card"><p>Bu sayfa demo amaçlı hazırlanmıştır.</p></div>`;
             }
         }
 
