@@ -3,24 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bionluk Demo</title>
+    <title>SaaS Demo Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --turquoise: #40E0D0;
-            --light-brown: #EDE0D4;
-            --dark-brown: #5C4033;
+            --primary: #3b82f6; /* Canlı Mavi */
+            --secondary: #10b981; /* Zümrüt Yeşili */
+            --danger: #ef4444; /* Kırmızı */
+            --warning: #f59e0b; /* Turuncu */
+            --bg-color: #f8fafc; /* Çok Açık Gri/Mavi (Ferah) */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--light-brown); 
-            color: var(--dark-brown); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
             overflow-x: hidden;
         }
         .header {
             background: white; 
-            padding: 1rem; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 1.5rem; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -28,73 +33,115 @@
             top: 0; 
             z-index: 100;
         }
-        .hamburger { font-size: 1.8rem; cursor: pointer; color: var(--dark-brown); }
+        .header h2 { color: var(--primary); font-weight: 700; }
+        .demo-badge {
+            background: var(--warning);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+        .hamburger { font-size: 1.8rem; cursor: pointer; color: var(--text-main); transition: 0.2s; }
+        .hamburger:hover { color: var(--primary); }
+        
         .menu {
-            position: fixed; top: 0; left: -100%; width: 80%; height: 100%; 
-            background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
-            transition: 0.3s; padding: 2rem 1rem; z-index: 200;
+            position: fixed; top: 0; left: -100%; width: 280px; height: 100%; 
+            background: white; box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 2rem 0; z-index: 200;
         }
         .menu.active { left: 0; }
+        .menu-title { padding: 0 1.5rem 1rem 1.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #e2e8f0; margin-bottom: 1rem; }
         .nav-link {
-            display: block; padding: 1rem; font-size: 1.1rem; 
-            color: var(--dark-brown); text-decoration: none; 
-            border-bottom: 1px solid #e2e8f0;
+            display: block; padding: 1rem 1.5rem; font-size: 1.05rem; 
+            color: var(--text-main); text-decoration: none; 
+            transition: 0.2s;
+            cursor: pointer;
         }
-        .nav-link:hover { background: var(--light-brown); color: var(--turquoise); }
-        .container { padding: 1rem; }
+        .nav-link:hover { background: #eff6ff; color: var(--primary); border-left: 4px solid var(--primary); padding-left: calc(1.5rem - 4px); }
+        
+        .container { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
+        .page-title { margin-bottom: 1.5rem; font-size: 1.8rem; color: var(--text-main); border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        
         .card {
             background: white; 
             border-radius: 12px; 
-            padding: 1.2rem; 
+            padding: 1.5rem; 
             margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--turquoise);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+            transition: all 0.4s ease; /* Silme animasyonu için */
+            position: relative;
+            overflow: hidden;
         }
-        button {
-            padding: 0.7rem 1.2rem; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 500;
-            margin-right: 8px;
+        .card h3 { color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.2rem; }
+        .card p { color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5; font-size: 0.95rem; }
+        
+        .badge {
+            display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 8px;
         }
-        .btn-edit { background: var(--turquoise); color: white; }
-        .btn-delete { background: #ef4444; color: white; }
+        .badge-success { background: var(--secondary); }
+        .badge-warning { background: var(--warning); }
+        .badge-info { background: var(--primary); }
 
-        /* Dokunma / Tıklama Efekti */
+        .btn-group { display: flex; gap: 8px; }
+        button {
+            padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-edit { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
+        .btn-edit:hover { background: var(--primary); color: white; }
+        .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+        .btn-delete:hover { background: var(--danger); color: white; }
+
+        /* Gelişmiş Tıklama / Ripple Efekti */
         .ripple {
-            position: absolute;
+            position: fixed; /* Ekranda tam tıklandığı yerde kalması için fixed */
             border-radius: 50%;
-            background: rgba(64, 224, 208, 0.4);
             transform: scale(0);
-            animation: rippleAnim 600ms linear;
+            animation: rippleAnim 600ms ease-out forwards;
             pointer-events: none;
             z-index: 9999;
         }
         @keyframes rippleAnim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0; }
         }
 
+        /* Bildirim (Toast) */
         .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--dark-brown); color: white; 
-            padding: 1rem 1.5rem; border-radius: 8px;
-            display: none; z-index: 300;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #1e293b; color: white; 
+            padding: 1rem 2rem; border-radius: 30px;
+            font-weight: 500; font-size: 0.95rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 300;
         }
-        h1 { color: var(--dark-brown); margin-bottom: 1rem; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Grafik Konteyneri */
+        .chart-container {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;
+        }
+        .chart-box {
+            background: white; padding: 1.5rem; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            flex: 1; min-width: 300px;
+        }
+        canvas { max-height: 300px; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
-        <h2>Bionluk Demo</h2>
-        <div>Demo</div>
+        <h2>SaaS Admin</h2>
+        <div class="demo-badge">Demo Sürüm</div>
     </div>
 
     <div class="menu" id="menu">
+        <div class="menu-title">ANA MENÜ</div>
         <div onclick="navigate('dashboard')" class="nav-link">📊 Dashboard</div>
         <div onclick="navigate('orders')" class="nav-link">📦 Siparişlerim</div>
         <div onclick="navigate('freelancers')" class="nav-link">👤 Freelancerlar</div>
@@ -105,64 +152,244 @@
     </div>
 
     <div class="container" id="content"></div>
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast">✅ İşlem başarılı</div>
 
     <script>
+        // --- 1. Gelişmiş Renkli Ripple (Baloncuk) Efekti ---
+        const rippleColors = [
+            'rgba(64, 224, 208, 0.6)',  // Turkuaz
+            'rgba(16, 185, 129, 0.6)',  // Zümrüt Yeşili
+            'rgba(244, 63, 94, 0.6)',   // Mercan / Gül
+            'rgba(245, 158, 11, 0.6)',  // Sarı / Turuncu
+            'rgba(139, 92, 246, 0.6)'   // Mor
+        ];
+        let colorIndex = 0;
+
         function createRipple(event) {
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
             
-            const rect = document.body.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height) * 0.6;
+            // Baloncuğun boyutu küçültüldü (örneğin 80px)
+            const size = 80; 
+            ripple.style.width = size + 'px';
+            ripple.style.height = size + 'px';
             
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = (event.clientX || event.touches[0].clientX) - size/2 + 'px';
-            ripple.style.top = (event.clientY || event.touches[0].clientY) - size/2 + 'px';
+            // Dokunmatik ve Mouse koordinatlarını al
+            const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+            const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+            
+            ripple.style.left = (clientX - size / 2) + 'px';
+            ripple.style.top = (clientY - size / 2) + 'px';
+            
+            // Rengi ata ve sıradaki renge geç
+            ripple.style.background = rippleColors[colorIndex];
+            colorIndex = (colorIndex + 1) % rippleColors.length;
             
             document.body.appendChild(ripple);
             
-            setTimeout(() => ripple.remove(), 700);
+            // Animasyon bitince elementi DOM'dan temizle
+            setTimeout(() => ripple.remove(), 600);
         }
 
-        // Tüm tıklama ve dokunmalarda ripple efekti
         document.addEventListener('click', createRipple);
-        document.addEventListener('touchstart', createRipple);
+        // Mobilde kaydırırken de çalışmasını istiyorsan touchstart bırakılabilir, 
+        // ancak tıklama hassasiyeti için bazen sadece click yeterlidir.
+        document.addEventListener('touchstart', createRipple, {passive: true});
 
+
+        // --- 2. Menü ve Bildirim İşlemleri ---
         function toggleMenu() {
             document.getElementById('menu').classList.toggle('active');
         }
 
+        let toastTimeout;
         function showToast(message) {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
+            toast.innerHTML = message;
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
-        function deleteItem() {
+        // --- 3. Animasyonlu Silme ve Geri Getirme (Auto-Restore) ---
+        function deleteItem(btn) {
+            // Tıklanan butona ait kartı bul
+            const card = btn.closest('.card');
+            
             if (confirm("Bu öğeyi silmek istediğinize emin misiniz?")) {
-                showToast("✅ Silindi (Demo - Sayfa yenilenince geri gelir)");
+                showToast("🗑️ Öğe silindi. (Demo: 5sn sonra geri yüklenecek)");
+                
+                // 1. Aşama: Kartı küçült ve şeffaflaştır
+                card.style.opacity = "0";
+                card.style.transform = "scale(0.9)";
+                
+                // 2. Aşama: Ekrandan tamamen kaldır (yer kaplamasın)
+                setTimeout(() => {
+                    card.style.display = "none";
+                }, 400); // CSS transition süresi kadar bekle
+
+                // 3. Aşama: 5 saniye sonra otomatik geri getir
+                setTimeout(() => {
+                    card.style.display = "block";
+                    // Display block olduktan çok kısa süre sonra opacity verilmeli ki animasyon çalışsın
+                    setTimeout(() => {
+                        card.style.opacity = "1";
+                        card.style.transform = "scale(1)";
+                        showToast("♻️ Demo verileri temiz tutuluyor. Öğe geri yüklendi!");
+                    }, 50);
+                }, 5000);
             }
         }
 
+        // Sadece düzenle butonuna tıklandığında çıkacak bildirim
+        function editItem() {
+            showToast("✏️ Düzenleme ekranı açılıyor... (Demo Modu)");
+        }
+
+
+        // --- 4. Sayfa İçerikleri ve Yönlendirme ---
         function navigate(page) {
-            toggleMenu();
+            // Menü açıksa kapat
+            document.getElementById('menu').classList.remove('active');
             const content = document.getElementById('content');
             
-            if (page === 'dashboard') {
-                content.innerHTML = `<h1>Dashboard</h1><div class="card"><h3>Bu Ay Özeti</h3><p>• 28 Yeni Sipariş<br>• 19 Tamamlanan İş<br>• Toplam Kazanç: 47.850 TL</p></div>`;
-            } else if (page === 'orders') {
-                content.innerHTML = `
-                    <h1>Siparişlerim</h1>
-                    <div class="card"><h3>Logo Tasarımı</h3><p>Ahmet Yılmaz • Tamamlandı • 1250 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                    <div class="card"><h3>Web Sitesi Yapımı</h3><p>Ayşe Demir • İptal Edildi • 4500 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                    <div class="card"><h3>Instagram İçerik</h3><p>Mehmet Kaya • Bekliyor • 800 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                `;
-            } else {
-                content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><div class="card"><p>Bu sayfa demo amaçlı hazırlanmıştır.</p></div>`;
+            // Tüm içerikleri tanımladığımız nesne
+            const pages = {
+                'dashboard': `
+                    <h1 class="page-title">📊 Sistem Özeti</h1>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="card" style="border-left-color: var(--primary);">
+                            <h3>Bugünkü Kazanç</h3><p style="font-size: 1.5rem; font-weight: bold; color: var(--text-main);">₺4,250.00</p><p>Düne göre %12 artış</p>
+                        </div>
+                        <div class="card" style="border-left-color: var(--secondary);">
+                            <h3>Aktif Siparişler</h3><p style="font-size: 1.5rem; font-weight: bold; color: var(--text-main);">38 Adet</p><p>5 sipariş teslim aşamasında</p>
+                        </div>
+                        <div class="card" style="border-left-color: var(--warning);">
+                            <h3>Yeni Mesajlar</h3><p style="font-size: 1.5rem; font-weight: bold; color: var(--text-main);">14</p><p>Yanıt bekleyen 3 talep var</p>
+                        </div>
+                    </div>
+                `,
+                'orders': `
+                    <h1 class="page-title">📦 Siparişlerim</h1>
+                    ${createCard('Kurumsal Kimlik Tasarımı', 'Müşteri: ABC Lojistik<br>Tutar: 12.500 TL', 'Tamamlandı', 'success')}
+                    ${createCard('E-Ticaret Web Sitesi', 'Müşteri: Moda Evi<br>Tutar: 45.000 TL', 'Devam Ediyor', 'warning')}
+                    ${createCard('Sosyal Medya Yönetimi', 'Müşteri: Kahve Dünyası<br>Tutar: 8.000 TL / Ay', 'Beklemede', 'info')}
+                    ${createCard('SEO Optimizasyonu', 'Müşteri: Tech Market<br>Tutar: 15.000 TL', 'Devam Ediyor', 'warning')}
+                `,
+                'freelancers': `
+                    <h1 class="page-title">👤 Freelancerlar</h1>
+                    ${createCard('Ahmet Yılmaz', 'Uzmanlık: Python & Django Geliştirici<br>Puan: ⭐⭐⭐⭐⭐ (4.9/5)', 'Aktif', 'success')}
+                    ${createCard('Zeynep Çelik', 'Uzmanlık: UI/UX Tasarımcısı & Figma<br>Puan: ⭐⭐⭐⭐⭐ (5.0/5)', 'Meşgul', 'warning')}
+                    ${createCard('Burak Kaya', 'Uzmanlık: Dijital Pazarlama & SEO<br>Puan: ⭐⭐⭐⭐ (4.7/5)', 'Aktif', 'success')}
+                `,
+                'services': `
+                    <h1 class="page-title">🛍️ Satıştaki Hizmetler</h1>
+                    ${createCard('Tam Kapsamlı SEO Danışmanlığı', 'Kategori: Pazarlama<br>Başlangıç: 5.000 TL', 'Yayında', 'success')}
+                    ${createCard('Özel Yazılım Otomasyon Botu', 'Kategori: Yazılım<br>Başlangıç: 10.000 TL', 'Yayında', 'success')}
+                    ${createCard('Profesyonel Logo & Marka Yüzü', 'Kategori: Tasarım<br>Başlangıç: 3.500 TL', 'Yayında', 'success')}
+                    ${createCard('İçerik Yazarlığı (Aylık 10 Makale)', 'Kategori: Metin Yazarlığı<br>Başlangıç: 2.000 TL', 'Pasif', 'info')}
+                `,
+                'customers': `
+                    <h1 class="page-title">👥 Müşteriler</h1>
+                    ${createCard('Global A.Ş.', 'Yetkili: Mert Demir<br>Toplam Harcama: 125.000 TL', 'VIP Müşteri', 'warning')}
+                    ${createCard('Natura Kozmetik', 'Yetkili: Ayşe Yılmaz<br>Toplam Harcama: 42.000 TL', 'Düzenli Müşteri', 'success')}
+                    ${createCard('StartUp Teknoloji', 'Yetkili: Can Öz<br>Toplam Harcama: 18.500 TL', 'Yeni', 'info')}
+                `,
+                'reports': `
+                    <h1 class="page-title">📈 Performans Raporları</h1>
+                    <p>Bu ayki satış ve kategori analizleri aşağıda listelenmiştir.</p>
+                    <div class="chart-container">
+                        <div class="chart-box">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                `,
+                'settings': `
+                    <h1 class="page-title">⚙️ Sistem Ayarları</h1>
+                    <div class="card">
+                        <h3>Site Genel Ayarları</h3>
+                        <p>Site Başlığı: SaaS Premium Demo<br>Bakım Modu: Kapalı</p>
+                        <button class="btn-edit" onclick="editItem()">Ayarları Değiştir</button>
+                    </div>
+                    <div class="card">
+                        <h3>Ödeme Altyapısı</h3>
+                        <p>Aktif Sanal Pos: Stripe & Iyzico<br>Para Birimi: TRY (₺)</p>
+                        <button class="btn-edit" onclick="editItem()">Yapılandır</button>
+                    </div>
+                `
+            };
+
+            // Sayfa içeriğini bas
+            content.innerHTML = pages[page] || '<h1>Sayfa Bulunamadı</h1>';
+
+            // Eğer Raporlar sekmesine girildiyse grafikleri çiz
+            if (page === 'reports') {
+                renderCharts();
             }
         }
 
+        // Tekrar eden kart yapısını oluşturan yardımcı fonksiyon
+        function createCard(title, text, badgeText, badgeClass) {
+            return \`
+                <div class="card">
+                    <span class="badge badge-\${badgeClass}">\${badgeText}</span>
+                    <h3>\${title}</h3>
+                    <p>\${text}</p>
+                    <div class="btn-group">
+                        <button class="btn-edit" onclick="editItem()">✏️ Düzenle</button>
+                        <button class="btn-delete" onclick="deleteItem(this)">🗑️ Sil</button>
+                    </div>
+                </div>
+            \`;
+        }
+
+        // Chart.js Grafikleri Çizme Fonksiyonu
+        function renderCharts() {
+            // Sütun Grafiği (Aylık Satış)
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                    datasets: [{
+                        label: 'Aylık Gelir (Bin TL)',
+                        data: [12, 19, 15, 25, 22, 30],
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Pasta Grafiği (Kategori Dağılımı)
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Yazılım', 'Tasarım', 'SEO', 'Pazarlama'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(244, 63, 94, 0.8)'
+                        ]
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Uygulama başlarken Dashboard'u aç
         window.onload = () => navigate('dashboard');
     </script>
 </body>
