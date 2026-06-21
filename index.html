@@ -1,164 +1,695 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexora Demo Panel</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nexora Panel</title>
+
 <style>
 :root{
---c1:#14b8a6;--c2:#3b82f6;--c3:#8b5cf6;--c4:#22c55e;--c5:#ec4899;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --primary:#14b8a6;
+  --blue:#3b82f6;
+  --purple:#8b5cf6;
+  --green:#22c55e;
+  --pink:#ec4899;
+  --red:#ef4444;
+  --orange:#f97316;
+  --dark:#0f172a;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Segoe UI,sans-serif;background:#f3f6fb;color:#1e293b}
-.header{position:sticky;top:0;background:#fff;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:99}
-.menu{position:fixed;left:-280px;top:0;width:280px;height:100%;background:#fff;transition:.3s;padding-top:70px;box-shadow:2px 0 15px rgba(0,0,0,.15)}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+  box-shadow:0 4px 18px rgba(15,23,42,.08);
+}
+
+.logo{
+  font-weight:800;
+  font-size:22px;
+  background:linear-gradient(90deg,var(--primary),var(--blue),var(--purple));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hamburger{
+  font-size:28px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.badge{
+  background:linear-gradient(90deg,var(--primary),var(--blue));
+  color:white;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:13px;
+}
+
+.menu{
+  position:fixed;
+  top:0;
+  left:-300px;
+  width:290px;
+  height:100%;
+  background:white;
+  z-index:100;
+  padding:72px 14px 20px;
+  box-shadow:10px 0 30px rgba(15,23,42,.18);
+  transition:.28s;
+}
+
 .menu.active{left:0}
-.nav-link{padding:14px 18px;border-bottom:1px solid #eee;cursor:pointer}
-.nav-link:hover{background:#f5f5f5}
-.container{padding:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-.stat{background:#fff;padding:15px;border-radius:14px}
-.card{background:#fff;margin:12px 0;padding:15px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-button{border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer}
-.edit{background:var(--c2)} .del{background:#ef4444}
-.bar{height:22px;background:linear-gradient(90deg,var(--c1),var(--c3));border-radius:20px;margin:8px 0;color:#fff;padding-left:10px;line-height:22px}
-.toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:10px}
-.ripple{position:fixed;border-radius:50%;pointer-events:none;animation:r .7s linear}
-@keyframes r{from{transform:scale(.2);opacity:.8}to{transform:scale(3);opacity:0}}
+
+.nav-link{
+  padding:14px 15px;
+  border-radius:12px;
+  margin-bottom:7px;
+  cursor:pointer;
+  color:#334155;
+  font-weight:600;
+}
+
+.nav-link:hover,.nav-link.active{
+  background:linear-gradient(90deg,rgba(20,184,166,.12),rgba(59,130,246,.12));
+  color:#0f766e;
+}
+
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.35);
+  z-index:90;
+}
+
+.overlay.active{display:block}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+.page-title{
+  margin:8px 0 16px;
+}
+
+.page-title h1{
+  font-size:28px;
+}
+
+.page-title p{
+  color:var(--muted);
+  margin-top:5px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;
+}
+
+.card,.stat,.panel{
+  background:var(--card);
+  border-radius:18px;
+  padding:17px;
+  box-shadow:0 8px 24px rgba(15,23,42,.07);
+  border:1px solid rgba(226,232,240,.8);
+}
+
+.stat{
+  position:relative;
+  overflow:hidden;
+}
+
+.stat:before{
+  content:"";
+  position:absolute;
+  right:-30px;
+  top:-30px;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--blue));
+  opacity:.18;
+}
+
+.stat h2{
+  font-size:25px;
+  margin-bottom:7px;
+}
+
+.stat p{
+  color:var(--muted);
+}
+
+.card{
+  margin-bottom:14px;
+}
+
+.card-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.card h3{
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.meta{
+  color:var(--muted);
+  line-height:1.55;
+  font-size:14px;
+}
+
+.actions{
+  margin-top:13px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+button{
+  border:0;
+  padding:9px 13px;
+  border-radius:10px;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.btn-edit{background:var(--blue)}
+.btn-delete{background:var(--red)}
+.btn-view{background:var(--purple)}
+.btn-save{background:var(--green)}
+.btn-dark{background:var(--dark)}
+
+.status{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  color:white;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.s-green{background:var(--green)}
+.s-blue{background:var(--blue)}
+.s-orange{background:var(--orange)}
+.s-red{background:var(--red)}
+.s-purple{background:var(--purple)}
+
+.search-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.search-row input{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  outline:none;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+}
+
+.table th,.table td{
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--line);
+  font-size:14px;
+}
+
+.table th{
+  color:var(--muted);
+}
+
+.bar-wrap{
+  margin:14px 0;
+}
+
+.bar-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.bar-bg{
+  height:24px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.bar{
+  height:100%;
+  color:white;
+  font-size:12px;
+  line-height:24px;
+  padding-left:10px;
+  background:linear-gradient(90deg,var(--primary),var(--blue),var(--purple));
+}
+
+.two-col{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:14px;
+}
+
+.toast{
+  display:none;
+  position:fixed;
+  bottom:22px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#0f172a;
+  color:white;
+  padding:13px 18px;
+  border-radius:12px;
+  z-index:200;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.ripple{
+  position:fixed;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  pointer-events:none;
+  opacity:.75;
+  animation:ripple .7s ease-out forwards;
+  z-index:9999;
+}
+
+@keyframes ripple{
+  from{transform:scale(.25);opacity:.8}
+  to{transform:scale(3);opacity:0}
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:180;
+  background:rgba(15,23,42,.45);
+  padding:20px;
+}
+
+.modal.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal-box{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.modal-box input,.modal-box textarea,.modal-box select{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin:8px 0 12px;
+}
+
+.footer-note{
+  color:var(--muted);
+  font-size:13px;
+  text-align:center;
+  margin:25px 0 5px;
+}
+
+@media(max-width:760px){
+  .two-col{grid-template-columns:1fr}
+  .table{display:block;overflow-x:auto}
+  .header{padding:13px}
+  .page-title h1{font-size:24px}
+}
 </style>
 </head>
+
 <body>
+
 <div class="header">
-<div onclick="toggleMenu()" style="font-size:28px;cursor:pointer">☰</div>
-<h2>Nexora</h2>
-<div>Demo</div>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="logo">Nexora</div>
+  <div class="badge">Demo Panel</div>
 </div>
 
-<div id="menu" class="menu">
-<div class="nav-link" onclick="navigate('dashboard')">📊 Dashboard</div>
-<div class="nav-link" onclick="navigate('orders')">📦 Siparişler</div>
-<div class="nav-link" onclick="navigate('freelancers')">👨‍💻 Freelancerlar</div>
-<div class="nav-link" onclick="navigate('services')">🛒 Hizmetler</div>
-<div class="nav-link" onclick="navigate('customers')">👥 Müşteriler</div>
-<div class="nav-link" onclick="navigate('reports')">📈 Raporlar</div>
-<div class="nav-link" onclick="navigate('settings')">⚙️ Ayarlar</div>
-</div>
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
-<div id="content" class="container"></div>
+<nav id="menu" class="menu">
+  <div class="nav-link" onclick="navigate('dashboard')">📊 Dashboard</div>
+  <div class="nav-link" onclick="navigate('orders')">📦 Siparişler</div>
+  <div class="nav-link" onclick="navigate('freelancers')">👨‍💻 Freelancerlar</div>
+  <div class="nav-link" onclick="navigate('services')">🛒 Hizmetler</div>
+  <div class="nav-link" onclick="navigate('customers')">👥 Müşteriler</div>
+  <div class="nav-link" onclick="navigate('reports')">📈 Raporlar</div>
+  <div class="nav-link" onclick="navigate('settings')">⚙️ Ayarlar</div>
+</nav>
+
+<main id="content" class="container"></main>
+
 <div id="toast" class="toast"></div>
 
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h2>Düzenle</h2>
+    <label>Başlık</label>
+    <input id="editTitle" />
+    <label>Açıklama</label>
+    <textarea id="editText" rows="4"></textarea>
+    <div class="actions">
+      <button class="btn-save" onclick="saveEdit()">Kaydet</button>
+      <button class="btn-dark" onclick="closeModal()">Kapat</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const colors=["#14b8a6","#3b82f6","#8b5cf6","#22c55e","#ec4899"];
-
-document.addEventListener("click",e=>{
- const d=document.createElement("div");
- d.className="ripple";
- const c=colors[Math.floor(Math.random()*colors.length)];
- d.style.background=c;
- d.style.width="35px"; d.style.height="35px";
- d.style.left=(e.clientX-17)+"px";
- d.style.top=(e.clientY-17)+"px";
- document.body.appendChild(d);
- setTimeout(()=>d.remove(),700);
-});
-
-function toggleMenu(){menu.classList.toggle("active")}
-function toast(t){
- const x=document.getElementById("toast");
- x.innerText=t;x.style.display="block";
- setTimeout(()=>x.style.display="none",2500);
-}
-function del(btn){
- const card=btn.closest(".card");
- card.remove();
- toast("Kayıt silindi (Demo)");
- setTimeout(()=>navigate(currentPage),5000);
-}
-function edit(){toast("Düzenleme ekranı (Demo)")}
+const rippleColors=["#14b8a6","#3b82f6","#8b5cf6","#22c55e","#ec4899"];
 
 let currentPage="dashboard";
+let editingId=null;
+
+const data={
+  orders:[
+    {id:1,title:"Kurumsal Web Sitesi",text:"Ayşe Demir • ₺12.000 • Teslim: 24 Haziran 2026",status:"Devam Ediyor",s:"s-blue"},
+    {id:2,title:"Logo Tasarımı",text:"Mehmet Kaya • ₺1.500 • Teslim edildi",status:"Tamamlandı",s:"s-green"},
+    {id:3,title:"SEO Optimizasyonu",text:"Hasan Çelik • ₺4.200 • Anahtar kelime analizi bekleniyor",status:"Bekliyor",s:"s-orange"},
+    {id:4,title:"Mobil Uygulama UI",text:"Zeynep Akın • ₺8.900 • 12 ekran tasarımı",status:"Devam Ediyor",s:"s-blue"},
+    {id:5,title:"E-Ticaret Mini Panel",text:"Murat Yıldız • ₺15.500 • Ürün yönetimi dahil",status:"Revize",s:"s-purple"}
+  ],
+  freelancers:[
+    {id:11,title:"Ahmet Yılmaz",text:"Frontend Developer • React, HTML, CSS • 4.9 puan",status:"Aktif",s:"s-green"},
+    {id:12,title:"Ayşe Demir",text:"Grafik Tasarımcı • Logo, sosyal medya, kurumsal kimlik",status:"Müsait",s:"s-blue"},
+    {id:13,title:"Can Özkan",text:"Mobil Geliştirici • Flutter, Firebase • 36 iş tamamladı",status:"Yoğun",s:"s-orange"},
+    {id:14,title:"Fatma Aydın",text:"SEO Uzmanı • Teknik SEO, içerik planı, raporlama",status:"Aktif",s:"s-green"},
+    {id:15,title:"Burak Şahin",text:"Backend Developer • Python, FastAPI, PostgreSQL",status:"Yeni",s:"s-purple"}
+  ],
+  services:[
+    {id:21,title:"React Web Uygulaması",text:"Başlangıç ₺9.000 • Responsive tasarım • Admin panel",status:"Popüler",s:"s-purple"},
+    {id:22,title:"WordPress Kurulum",text:"Başlangıç ₺2.500 • Tema kurulumu • Temel SEO",status:"Hızlı Teslim",s:"s-green"},
+    {id:23,title:"Logo Tasarım Paketi",text:"Başlangıç ₺1.200 • 3 konsept • 2 revize",status:"Ekonomik",s:"s-blue"},
+    {id:24,title:"Sosyal Medya Yönetimi",text:"Başlangıç ₺3.000 • 12 post • içerik takvimi",status:"Aylık",s:"s-orange"},
+    {id:25,title:"Mini CRM Paneli",text:"Başlangıç ₺11.000 • Müşteri, görev ve rapor modülü",status:"Yeni",s:"s-purple"}
+  ],
+  customers:[
+    {id:31,title:"Ahmet Yılmaz",text:"5 sipariş • Toplam harcama ₺22.400 • Son işlem: Logo paketi",status:"Sadık Müşteri",s:"s-green"},
+    {id:32,title:"Elif Kaya",text:"2 sipariş • Toplam harcama ₺7.800 • Son işlem: SEO raporu",status:"Yeni",s:"s-blue"},
+    {id:33,title:"Murat Demir",text:"7 sipariş • Toplam harcama ₺41.200 • Son işlem: Web panel",status:"VIP",s:"s-purple"},
+    {id:34,title:"Hasan Çelik",text:"3 sipariş • Toplam harcama ₺12.100 • Son işlem: İçerik planı",status:"Aktif",s:"s-green"},
+    {id:35,title:"Zeynep Akın",text:"4 sipariş • Toplam harcama ₺19.500 • Son işlem: UI tasarım",status:"Devam Ediyor",s:"s-orange"}
+  ],
+  settings:[
+    {id:41,title:"Profil Ayarları",text:"Ad, unvan, profil açıklaması ve avatar bilgileri",status:"Aktif",s:"s-green"},
+    {id:42,title:"Bildirim Ayarları",text:"E-posta, SMS ve uygulama içi bildirim tercihleri",status:"Açık",s:"s-blue"},
+    {id:43,title:"Güvenlik",text:"Şifre değiştirme, iki adımlı doğrulama ve oturum kayıtları",status:"Önerilir",s:"s-orange"},
+    {id:44,title:"Tema Seçimi",text:"Açık tema, koyu tema ve renk paleti tercihleri",status:"Demo",s:"s-purple"},
+    {id:45,title:"Fatura Bilgileri",text:"Vergi numarası, adres ve ödeme yöntemi bilgileri",status:"Eksik",s:"s-red"}
+  ]
+};
+
+const originalData=JSON.parse(JSON.stringify(data));
+
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("active");
+  document.getElementById("overlay").classList.toggle("active");
+}
+
+function closeMenu(){
+  document.getElementById("menu").classList.remove("active");
+  document.getElementById("overlay").classList.remove("active");
+}
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.display="block";
+  setTimeout(()=>t.style.display="none",2600);
+}
+
+function pageTitle(title,desc){
+  return `
+  <div class="page-title">
+    <h1>${title}</h1>
+    <p>${desc}</p>
+  </div>`;
+}
+
+function stat(title,text){
+  return `<div class="stat"><h2>${title}</h2><p>${text}</p></div>`;
+}
+
+function itemCard(item,type){
+  return `
+  <div class="card" data-id="${item.id}">
+    <div class="card-top">
+      <div>
+        <h3>${item.title}</h3>
+        <div class="meta">${item.text}</div>
+      </div>
+      <span class="status ${item.s}">${item.status}</span>
+    </div>
+    <div class="actions">
+      <button class="btn-edit" onclick="openEdit('${type}',${item.id})">Düzenle</button>
+      <button class="btn-delete" onclick="deleteItem('${type}',${item.id})">Sil</button>
+      <button class="btn-view" onclick="showToast('Detay ekranı demo olarak hazırlandı')">Detay</button>
+    </div>
+  </div>`;
+}
+
+function listItems(type){
+  return data[type].map(x=>itemCard(x,type)).join("");
+}
+
+function searchBox(type){
+  return `
+  <div class="search-row">
+    <input placeholder="Bu sayfada ara..." oninput="filterCards(this.value)" />
+    <button class="btn-dark" onclick="resetData('${type}')">Verileri Yenile</button>
+  </div>`;
+}
 
 function navigate(page){
- currentPage=page;
- menu.classList.remove("active");
- const c=document.getElementById("content");
+  currentPage=page;
+  closeMenu();
+  const c=document.getElementById("content");
 
- if(page==="dashboard"){
- c.innerHTML=`
- <h1>Dashboard</h1><br>
- <div class="grid">
- <div class="stat"><h3>₺128.450</h3><p>Toplam Kazanç</p></div>
- <div class="stat"><h3>34</h3><p>Aktif Sipariş</p></div>
- <div class="stat"><h3>91</h3><p>Tamamlanan İş</p></div>
- <div class="stat"><h3>17</h3><p>Yeni Müşteri</p></div>
- </div>
- <div class="card"><h3>Son Aktiviteler</h3><br>✅ Logo Teslim Edildi<br>✅ Web Sitesi Yayında<br>📨 Yeni Teklif Geldi</div>`;
- }
+  if(page==="dashboard"){
+    c.innerHTML=
+    pageTitle("Dashboard","Nexora demo panel genel performans özeti.")+
+    `<div class="grid">
+      ${stat("₺128.450","Toplam kazanç")}
+      ${stat("34","Aktif sipariş")}
+      ${stat("91","Tamamlanan iş")}
+      ${stat("17","Yeni müşteri")}
+      ${stat("%92","Tamamlanma oranı")}
+      ${stat("4.8/5","Ortalama puan")}
+    </div>
+    <br>
+    <div class="two-col">
+      <div class="panel">
+        <h3>Son Aktiviteler</h3><br>
+        <table class="table">
+          <tr><th>İşlem</th><th>Durum</th></tr>
+          <tr><td>Kurumsal web sitesi teslim edildi</td><td><span class="status s-green">Tamamlandı</span></td></tr>
+          <tr><td>Mini CRM paneli için teklif geldi</td><td><span class="status s-blue">Yeni</span></td></tr>
+          <tr><td>SEO raporu müşteriye gönderildi</td><td><span class="status s-purple">Rapor</span></td></tr>
+          <tr><td>Logo paketi revize istendi</td><td><span class="status s-orange">Revize</span></td></tr>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Bugünkü Öncelikler</h3><br>
+        <p class="meta">• 2 sipariş teslim kontrolü</p>
+        <p class="meta">• 3 müşteri mesajı yanıtlanacak</p>
+        <p class="meta">• 1 teklif güncellenecek</p>
+        <p class="meta">• Rapor ekranı incelenecek</p>
+      </div>
+    </div>
+    <p class="footer-note">Demo veriler örnek amaçlıdır. Sayfa yenilenince ilk haline döner.</p>`;
+  }
 
- if(page==="orders"){
- c.innerHTML=`<h1>Siparişler</h1>
- ${card("Kurumsal Web Sitesi","Ayşe Demir • ₺12.000 • Devam Ediyor")}
- ${card("Logo Tasarımı","Mehmet Kaya • ₺1.500 • Tamamlandı")}
- ${card("SEO Optimizasyonu","Hasan Çelik • ₺4.200 • Bekliyor")}
- ${card("Mobil Uygulama UI","Zeynep Akın • ₺8.900 • Devam Ediyor")}`;
- }
+  if(page==="orders"){
+    c.innerHTML=pageTitle("Siparişler","Aktif ve geçmiş müşteri siparişleri.")+searchBox("orders")+listItems("orders");
+  }
 
- if(page==="freelancers"){
- c.innerHTML=`<h1>Freelancerlar</h1>
- ${card("Ahmet Yılmaz","Frontend Developer")}
- ${card("Ayşe Demir","Grafik Tasarımcı")}
- ${card("Can Özkan","Mobil Geliştirici")}
- ${card("Fatma Aydın","SEO Uzmanı")}`;
- }
+  if(page==="freelancers"){
+    c.innerHTML=pageTitle("Freelancerlar","Platformdaki örnek freelancer profilleri.")+searchBox("freelancers")+listItems("freelancers");
+  }
 
- if(page==="services"){
- c.innerHTML=`<h1>Hizmetler</h1>
- ${card("React Web Uygulaması","Başlangıç ₺9.000")}
- ${card("WordPress Kurulum","Başlangıç ₺2.500")}
- ${card("Logo Tasarım Paketi","Başlangıç ₺1.200")}
- ${card("Sosyal Medya Yönetimi","Başlangıç ₺3.000")}`;
- }
+  if(page==="services"){
+    c.innerHTML=pageTitle("Hizmetler","Satılabilir demo hizmet paketleri.")+searchBox("services")+listItems("services");
+  }
 
- if(page==="customers"){
- c.innerHTML=`<h1>Müşteriler</h1>
- ${card("Ahmet Yılmaz","5 Sipariş")}
- ${card("Elif Kaya","2 Sipariş")}
- ${card("Murat Demir","7 Sipariş")}
- ${card("Hasan Çelik","3 Sipariş")}`;
- }
+  if(page==="customers"){
+    c.innerHTML=pageTitle("Müşteriler","Örnek müşteri kayıtları ve işlem geçmişi.")+searchBox("customers")+listItems("customers");
+  }
 
- if(page==="reports"){
- c.innerHTML=`
- <h1>Raporlar</h1><br>
- <div class="card">
- <h3>Aylık Gelir</h3>
- <div class="bar" style="width:40%">Ocak</div>
- <div class="bar" style="width:60%">Şubat</div>
- <div class="bar" style="width:75%">Mart</div>
- <div class="bar" style="width:55%">Nisan</div>
- <div class="bar" style="width:90%">Mayıs</div>
- <div class="bar" style="width:100%">Haziran</div>
- </div>
- <div class="card">Tamamlanma Oranı: %92</div>`;
- }
+  if(page==="reports"){
+    c.innerHTML=pageTitle("Raporlar","Gelir, sipariş ve performans raporları.")+
+    `<div class="grid">
+      ${stat("₺47.850","Bu ay gelir")}
+      ${stat("28","Yeni sipariş")}
+      ${stat("19","Tamamlanan iş")}
+      ${stat("%14","Aylık büyüme")}
+    </div>
+    <br>
+    <div class="two-col">
+      <div class="panel">
+        <h3>Aylık Gelir Grafiği</h3>
+        ${bar("Ocak","₺18.000",38)}
+        ${bar("Şubat","₺27.500",55)}
+        ${bar("Mart","₺39.200",72)}
+        ${bar("Nisan","₺31.400",62)}
+        ${bar("Mayıs","₺45.800",88)}
+        ${bar("Haziran","₺47.850",94)}
+      </div>
+      <div class="panel">
+        <h3>Sipariş Dağılımı</h3>
+        ${bar("Web Tasarım","42%",80)}
+        ${bar("Logo","21%",45)}
+        ${bar("SEO","18%",38)}
+        ${bar("Sosyal Medya","19%",41)}
+      </div>
+    </div>
+    <br>
+    <div class="panel">
+      <h3>Performans Notları</h3><br>
+      <p class="meta">• En yüksek gelir Web Tasarım kategorisinden geldi.</p>
+      <p class="meta">• Tamamlanma oranı %92 seviyesinde.</p>
+      <p class="meta">• Tekrar sipariş veren müşteri oranı güçlü görünüyor.</p>
+      <p class="meta">• Haziran ayı önceki aya göre daha iyi performans gösterdi.</p>
+    </div>`;
+  }
 
- if(page==="settings"){
- c.innerHTML=`
- <h1>Ayarlar</h1>
- <div class="card">👤 Profil Ayarları</div>
- <div class="card">🔔 Bildirim Ayarları</div>
- <div class="card">🌐 Dil Seçenekleri</div>
- <div class="card">🎨 Tema Ayarları</div>`;
- }
+  if(page==="settings"){
+    c.innerHTML=pageTitle("Ayarlar","Demo panel ayar ve tercih bölümü.")+listItems("settings");
+  }
 }
 
-function card(title,text){
- return `<div class="card"><h3>\( {title}</h3><p> \){text}</p><br>
- <button class="edit" onclick="edit()">Düzenle</button>
- <button class="del" onclick="del(this)">Sil</button></div>`;
+function bar(label,value,width){
+  return `
+  <div class="bar-wrap">
+    <div class="bar-label"><span>${label}</span><b>${value}</b></div>
+    <div class="bar-bg"><div class="bar" style="width:${width}%">${width}%</div></div>
+  </div>`;
 }
+
+function deleteItem(type,id){
+  const ok=confirm("Bu kaydı silmek istediğine emin misin?");
+  if(!ok)return;
+
+  data[type]=data[type].filter(x=>x.id!==id);
+  navigate(currentPage);
+  showToast("Kayıt silindi. Demo olduğu için 5 saniye sonra geri gelecek.");
+
+  setTimeout(()=>{
+    data[type]=JSON.parse(JSON.stringify(originalData[type]));
+    if(currentPage===type) navigate(type);
+    showToast("Demo veriler otomatik geri yüklendi.");
+  },5000);
+}
+
+function resetData(type){
+  data[type]=JSON.parse(JSON.stringify(originalData[type]));
+  navigate(type);
+  showToast("Veriler ilk haline döndü.");
+}
+
+function openEdit(type,id){
+  const item=data[type].find(x=>x.id===id);
+  if(!item)return;
+  editingId={type,id};
+  document.getElementById("editTitle").value=item.title;
+  document.getElementById("editText").value=item.text;
+  document.getElementById("modal").classList.add("active");
+}
+
+function saveEdit(){
+  if(!editingId)return;
+  const item=data[editingId.type].find(x=>x.id===editingId.id);
+  item.title=document.getElementById("editTitle").value;
+  item.text=document.getElementById("editText").value;
+  closeModal();
+  navigate(currentPage);
+  showToast("Kayıt güncellendi. Sayfa yenilenirse demo veriler geri gelir.");
+}
+
+function closeModal(){
+  document.getElementById("modal").classList.remove("active");
+}
+
+function filterCards(q){
+  q=q.toLowerCase();
+  document.querySelectorAll(".card").forEach(card=>{
+    card.style.display=card.innerText.toLowerCase().includes(q) ? "block" : "none";
+  });
+}
+
+document.addEventListener("click",function(e){
+  const r=document.createElement("div");
+  r.className="ripple";
+  r.style.background=rippleColors[Math.floor(Math.random()*rippleColors.length)];
+  r.style.left=(e.clientX-17)+"px";
+  r.style.top=(e.clientY-17)+"px";
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),700);
+});
+
+document.addEventListener("touchstart",function(e){
+  if(!e.touches || !e.touches[0]) return;
+  const t=e.touches[0];
+  const r=document.createElement("div");
+  r.className="ripple";
+  r.style.background=rippleColors[Math.floor(Math.random()*rippleColors.length)];
+  r.style.left=(t.clientX-17)+"px";
+  r.style.top=(t.clientY-17)+"px";
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),700);
+},{passive:true});
 
 navigate("dashboard");
 </script>
+
 </body>
 </html>
