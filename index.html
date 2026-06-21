@@ -1,169 +1,164 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bionluk Demo</title>
-    <style>
-        :root {
-            --turquoise: #40E0D0;
-            --light-brown: #EDE0D4;
-            --dark-brown: #5C4033;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--light-brown); 
-            color: var(--dark-brown); 
-            overflow-x: hidden;
-        }
-        .header {
-            background: white; 
-            padding: 1rem; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-        }
-        .hamburger { font-size: 1.8rem; cursor: pointer; color: var(--dark-brown); }
-        .menu {
-            position: fixed; top: 0; left: -100%; width: 80%; height: 100%; 
-            background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
-            transition: 0.3s; padding: 2rem 1rem; z-index: 200;
-        }
-        .menu.active { left: 0; }
-        .nav-link {
-            display: block; padding: 1rem; font-size: 1.1rem; 
-            color: var(--dark-brown); text-decoration: none; 
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .nav-link:hover { background: var(--light-brown); color: var(--turquoise); }
-        .container { padding: 1rem; }
-        .card {
-            background: white; 
-            border-radius: 12px; 
-            padding: 1.2rem; 
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--turquoise);
-        }
-        button {
-            padding: 0.7rem 1.2rem; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 500;
-            margin-right: 8px;
-        }
-        .btn-edit { background: var(--turquoise); color: white; }
-        .btn-delete { background: #ef4444; color: white; }
-
-        /* Dokunma / Tıklama Efekti */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(64, 224, 208, 0.4);
-            transform: scale(0);
-            animation: rippleAnim 600ms linear;
-            pointer-events: none;
-            z-index: 9999;
-        }
-        @keyframes rippleAnim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--dark-brown); color: white; 
-            padding: 1rem 1.5rem; border-radius: 8px;
-            display: none; z-index: 300;
-        }
-        h1 { color: var(--dark-brown); margin-bottom: 1rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexora Demo Panel</title>
+<style>
+:root{
+--c1:#14b8a6;--c2:#3b82f6;--c3:#8b5cf6;--c4:#22c55e;--c5:#ec4899;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,sans-serif;background:#f3f6fb;color:#1e293b}
+.header{position:sticky;top:0;background:#fff;padding:15px;display:flex;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:99}
+.menu{position:fixed;left:-280px;top:0;width:280px;height:100%;background:#fff;transition:.3s;padding-top:70px;box-shadow:2px 0 15px rgba(0,0,0,.15)}
+.menu.active{left:0}
+.nav-link{padding:14px 18px;border-bottom:1px solid #eee;cursor:pointer}
+.nav-link:hover{background:#f5f5f5}
+.container{padding:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat{background:#fff;padding:15px;border-radius:14px}
+.card{background:#fff;margin:12px 0;padding:15px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+button{border:none;padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer}
+.edit{background:var(--c2)} .del{background:#ef4444}
+.bar{height:22px;background:linear-gradient(90deg,var(--c1),var(--c3));border-radius:20px;margin:8px 0;color:#fff;padding-left:10px;line-height:22px}
+.toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:10px}
+.ripple{position:fixed;border-radius:50%;pointer-events:none;animation:r .7s linear}
+@keyframes r{from{transform:scale(.2);opacity:.8}to{transform:scale(3);opacity:0}}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
-        <h2>Bionluk Demo</h2>
-        <div>Demo</div>
-    </div>
+<div class="header">
+<div onclick="toggleMenu()" style="font-size:28px;cursor:pointer">☰</div>
+<h2>Nexora</h2>
+<div>Demo</div>
+</div>
 
-    <div class="menu" id="menu">
-        <div onclick="navigate('dashboard')" class="nav-link">📊 Dashboard</div>
-        <div onclick="navigate('orders')" class="nav-link">📦 Siparişlerim</div>
-        <div onclick="navigate('freelancers')" class="nav-link">👤 Freelancerlar</div>
-        <div onclick="navigate('services')" class="nav-link">🛍️ Hizmetler</div>
-        <div onclick="navigate('customers')" class="nav-link">👥 Müşteriler</div>
-        <div onclick="navigate('reports')" class="nav-link">📈 Raporlar</div>
-        <div onclick="navigate('settings')" class="nav-link">⚙️ Ayarlar</div>
-    </div>
+<div id="menu" class="menu">
+<div class="nav-link" onclick="navigate('dashboard')">📊 Dashboard</div>
+<div class="nav-link" onclick="navigate('orders')">📦 Siparişler</div>
+<div class="nav-link" onclick="navigate('freelancers')">👨‍💻 Freelancerlar</div>
+<div class="nav-link" onclick="navigate('services')">🛒 Hizmetler</div>
+<div class="nav-link" onclick="navigate('customers')">👥 Müşteriler</div>
+<div class="nav-link" onclick="navigate('reports')">📈 Raporlar</div>
+<div class="nav-link" onclick="navigate('settings')">⚙️ Ayarlar</div>
+</div>
 
-    <div class="container" id="content"></div>
-    <div class="toast" id="toast"></div>
+<div id="content" class="container"></div>
+<div id="toast" class="toast"></div>
 
-    <script>
-        function createRipple(event) {
-            const ripple = document.createElement('div');
-            ripple.classList.add('ripple');
-            
-            const rect = document.body.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height) * 0.6;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = (event.clientX || event.touches[0].clientX) - size/2 + 'px';
-            ripple.style.top = (event.clientY || event.touches[0].clientY) - size/2 + 'px';
-            
-            document.body.appendChild(ripple);
-            
-            setTimeout(() => ripple.remove(), 700);
-        }
+<script>
+const colors=["#14b8a6","#3b82f6","#8b5cf6","#22c55e","#ec4899"];
 
-        // Tüm tıklama ve dokunmalarda ripple efekti
-        document.addEventListener('click', createRipple);
-        document.addEventListener('touchstart', createRipple);
+document.addEventListener("click",e=>{
+ const d=document.createElement("div");
+ d.className="ripple";
+ const c=colors[Math.floor(Math.random()*colors.length)];
+ d.style.background=c;
+ d.style.width="35px"; d.style.height="35px";
+ d.style.left=(e.clientX-17)+"px";
+ d.style.top=(e.clientY-17)+"px";
+ document.body.appendChild(d);
+ setTimeout(()=>d.remove(),700);
+});
 
-        function toggleMenu() {
-            document.getElementById('menu').classList.toggle('active');
-        }
+function toggleMenu(){menu.classList.toggle("active")}
+function toast(t){
+ const x=document.getElementById("toast");
+ x.innerText=t;x.style.display="block";
+ setTimeout(()=>x.style.display="none",2500);
+}
+function del(btn){
+ const card=btn.closest(".card");
+ card.remove();
+ toast("Kayıt silindi (Demo)");
+ setTimeout(()=>navigate(currentPage),5000);
+}
+function edit(){toast("Düzenleme ekranı (Demo)")}
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
-        }
+let currentPage="dashboard";
 
-        function deleteItem() {
-            if (confirm("Bu öğeyi silmek istediğinize emin misiniz?")) {
-                showToast("✅ Silindi (Demo - Sayfa yenilenince geri gelir)");
-            }
-        }
+function navigate(page){
+ currentPage=page;
+ menu.classList.remove("active");
+ const c=document.getElementById("content");
 
-        function navigate(page) {
-            toggleMenu();
-            const content = document.getElementById('content');
-            
-            if (page === 'dashboard') {
-                content.innerHTML = `<h1>Dashboard</h1><div class="card"><h3>Bu Ay Özeti</h3><p>• 28 Yeni Sipariş<br>• 19 Tamamlanan İş<br>• Toplam Kazanç: 47.850 TL</p></div>`;
-            } else if (page === 'orders') {
-                content.innerHTML = `
-                    <h1>Siparişlerim</h1>
-                    <div class="card"><h3>Logo Tasarımı</h3><p>Ahmet Yılmaz • Tamamlandı • 1250 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                    <div class="card"><h3>Web Sitesi Yapımı</h3><p>Ayşe Demir • İptal Edildi • 4500 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                    <div class="card"><h3>Instagram İçerik</h3><p>Mehmet Kaya • Bekliyor • 800 TL</p><button class="btn-edit">Düzenle</button><button class="btn-delete" onclick="deleteItem()">Sil</button></div>
-                `;
-            } else {
-                content.innerHTML = `<h1>${page.toUpperCase()} Sayfası</h1><div class="card"><p>Bu sayfa demo amaçlı hazırlanmıştır.</p></div>`;
-            }
-        }
+ if(page==="dashboard"){
+ c.innerHTML=`
+ <h1>Dashboard</h1><br>
+ <div class="grid">
+ <div class="stat"><h3>₺128.450</h3><p>Toplam Kazanç</p></div>
+ <div class="stat"><h3>34</h3><p>Aktif Sipariş</p></div>
+ <div class="stat"><h3>91</h3><p>Tamamlanan İş</p></div>
+ <div class="stat"><h3>17</h3><p>Yeni Müşteri</p></div>
+ </div>
+ <div class="card"><h3>Son Aktiviteler</h3><br>✅ Logo Teslim Edildi<br>✅ Web Sitesi Yayında<br>📨 Yeni Teklif Geldi</div>`;
+ }
 
-        window.onload = () => navigate('dashboard');
-    </script>
+ if(page==="orders"){
+ c.innerHTML=`<h1>Siparişler</h1>
+ ${card("Kurumsal Web Sitesi","Ayşe Demir • ₺12.000 • Devam Ediyor")}
+ ${card("Logo Tasarımı","Mehmet Kaya • ₺1.500 • Tamamlandı")}
+ ${card("SEO Optimizasyonu","Hasan Çelik • ₺4.200 • Bekliyor")}
+ ${card("Mobil Uygulama UI","Zeynep Akın • ₺8.900 • Devam Ediyor")}`;
+ }
+
+ if(page==="freelancers"){
+ c.innerHTML=`<h1>Freelancerlar</h1>
+ ${card("Ahmet Yılmaz","Frontend Developer")}
+ ${card("Ayşe Demir","Grafik Tasarımcı")}
+ ${card("Can Özkan","Mobil Geliştirici")}
+ ${card("Fatma Aydın","SEO Uzmanı")}`;
+ }
+
+ if(page==="services"){
+ c.innerHTML=`<h1>Hizmetler</h1>
+ ${card("React Web Uygulaması","Başlangıç ₺9.000")}
+ ${card("WordPress Kurulum","Başlangıç ₺2.500")}
+ ${card("Logo Tasarım Paketi","Başlangıç ₺1.200")}
+ ${card("Sosyal Medya Yönetimi","Başlangıç ₺3.000")}`;
+ }
+
+ if(page==="customers"){
+ c.innerHTML=`<h1>Müşteriler</h1>
+ ${card("Ahmet Yılmaz","5 Sipariş")}
+ ${card("Elif Kaya","2 Sipariş")}
+ ${card("Murat Demir","7 Sipariş")}
+ ${card("Hasan Çelik","3 Sipariş")}`;
+ }
+
+ if(page==="reports"){
+ c.innerHTML=`
+ <h1>Raporlar</h1><br>
+ <div class="card">
+ <h3>Aylık Gelir</h3>
+ <div class="bar" style="width:40%">Ocak</div>
+ <div class="bar" style="width:60%">Şubat</div>
+ <div class="bar" style="width:75%">Mart</div>
+ <div class="bar" style="width:55%">Nisan</div>
+ <div class="bar" style="width:90%">Mayıs</div>
+ <div class="bar" style="width:100%">Haziran</div>
+ </div>
+ <div class="card">Tamamlanma Oranı: %92</div>`;
+ }
+
+ if(page==="settings"){
+ c.innerHTML=`
+ <h1>Ayarlar</h1>
+ <div class="card">👤 Profil Ayarları</div>
+ <div class="card">🔔 Bildirim Ayarları</div>
+ <div class="card">🌐 Dil Seçenekleri</div>
+ <div class="card">🎨 Tema Ayarları</div>`;
+ }
+}
+
+function card(title,text){
+ return `<div class="card"><h3>\( {title}</h3><p> \){text}</p><br>
+ <button class="edit" onclick="edit()">Düzenle</button>
+ <button class="del" onclick="del(this)">Sil</button></div>`;
+}
+
+navigate("dashboard");
+</script>
 </body>
 </html>
